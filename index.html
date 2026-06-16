@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeperTango — Maratona Tango Piccante 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Inter',sans-serif; background:#FAFAF8; color:#2C2C2C; overflow-x:hidden; cursor:none; }
+
+/* URL Apps Script — cambia qui se rideploy */
+/* const APPS_SCRIPT_URL definita in JS */
+
+/* ============================================================
+   CURSORE CUSTOM
+   ============================================================ */
+.cursor { position:fixed; width:10px; height:10px; background:#C8372D; border-radius:50%; pointer-events:none; z-index:99999; transform:translate(-50%,-50%); transition:width .25s,height .25s,background .25s; }
+.cursor-ring { position:fixed; width:32px; height:32px; border:1.5px solid rgba(200,55,45,.4); border-radius:50%; pointer-events:none; z-index:99998; transform:translate(-50%,-50%); transition:width .3s,height .3s; }
+.cursor.big { width:18px; height:18px; background:#2E7D32; }
+.cursor-ring.big { width:46px; height:46px; border-color:rgba(46,125,50,.35); }
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  height:68px; padding:0 5%;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(250,250,248,.94); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,0,0,.06);
+  transition:box-shadow .3s;
+}
+nav.scrolled { box-shadow:0 4px 28px rgba(0,0,0,.08); }
+.nav-logo img { height:48px; width:auto; display:block; }
+.nav-links { display:flex; align-items:center; gap:2rem; list-style:none; }
+.nav-links a { color:#4a4a4a; text-decoration:none; font-size:.83rem; font-weight:500; letter-spacing:.06em; text-transform:uppercase; transition:color .25s; position:relative; }
+.nav-links a::after { content:''; position:absolute; bottom:-3px; left:0; width:0; height:1.5px; background:#C8372D; transition:width .3s; }
+.nav-links a:hover { color:#C8372D; }
+.nav-links a:hover::after { width:100%; }
+.nav-cta { background:#C8372D !important; color:#fff !important; padding:10px 22px; border-radius:3px; transition:background .25s !important; }
+.nav-cta::after { display:none !important; }
+.nav-cta:hover { background:#a62a22 !important; }
+.hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:none; }
+.hamburger span { width:22px; height:1.5px; background:#2C2C2C; display:block; transition:all .3s; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position:relative; height:100vh; min-height:680px;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; background:#fff;
+}
+.hero-bg {
+  position:absolute; inset:0;
+  background:
+    linear-gradient(to bottom, rgba(250,250,248,.7) 0%, rgba(250,250,248,.5) 50%, rgba(250,250,248,.9) 100%),
+    url('https://static.wixstatic.com/media/1b1050_3fc82fffd1c14595ad774a2e578933c0~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1b1050_3fc82fffd1c14595ad774a2e578933c0~mv2.jpg') center/cover no-repeat;
+  transform:scale(1.04); transition:transform 7s ease;
+}
+.particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.particle { position:absolute; border-radius:50%; opacity:0; animation:floatUp linear infinite; }
+@keyframes floatUp { 0%{opacity:0;transform:translateY(0);} 15%{opacity:.7;} 85%{opacity:.2;} 100%{opacity:0;transform:translateY(-95vh);} }
+
+.hero-content { position:relative; z-index:3; text-align:center; padding:0 5%; max-width:860px; }
+.hero-logo { display:flex; justify-content:center; margin-bottom:1.8rem; opacity:0; animation:fadeUp .9s ease .2s forwards; }
+.hero-logo img { width:130px; height:auto; filter:drop-shadow(0 4px 16px rgba(0,0,0,.12)); }
+.hero-eyebrow { font-family:'Dancing Script',cursive; font-size:1.3rem; color:#2E7D32; margin-bottom:1rem; opacity:0; animation:fadeUp .9s ease .4s forwards; }
+.hero-title { font-family:'Playfair Display',serif; font-size:clamp(2.8rem,7vw,5.5rem); font-weight:900; line-height:1.05; color:#2C2C2C; margin-bottom:1.4rem; opacity:0; animation:fadeUp .9s ease .65s forwards; }
+.hero-title em { color:#C8372D; font-style:italic; }
+.hero-dates { display:inline-flex; align-items:center; gap:1.5rem; background:#fff; border:1px solid #e8e3da; border-radius:40px; padding:10px 24px; margin-bottom:2rem; font-size:.85rem; color:#6a6a6a; box-shadow:0 4px 16px rgba(0,0,0,.06); opacity:0; animation:fadeUp .9s ease .85s forwards; }
+.hero-dates strong { color:#2C2C2C; }
+.hero-dates .sep { color:#ddd; }
+.hero-ctas { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; opacity:0; animation:fadeUp .9s ease 1.05s forwards; }
+.hero-scroll { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); z-index:3; display:flex; flex-direction:column; align-items:center; gap:7px; opacity:0; animation:fadeUp .9s ease 1.5s forwards; }
+.hero-scroll span { font-size:.65rem; letter-spacing:.18em; text-transform:uppercase; color:#aaa; }
+.scroll-line { width:1px; height:44px; background:linear-gradient(to bottom,#C8372D,transparent); animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.35;} 50%{opacity:1;} }
+
+/* ============================================================
+   BOTTONI
+   ============================================================ */
+.btn-primary { background:#C8372D; color:#fff; padding:15px 36px; border:none; border-radius:3px; font-size:.85rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; text-decoration:none; cursor:none; display:inline-flex; align-items:center; gap:9px; transition:background .3s,transform .25s,box-shadow .3s; }
+.btn-primary:hover { background:#a62a22; transform:translateY(-2px); box-shadow:0 8px 28px rgba(200,55,45,.28); }
+.btn-outline { background:transparent; color:#2C2C2C; padding:15px 36px; border:1.5px solid rgba(44,44,44,.3); border-radius:3px; font-size:.85rem; font-weight:500; letter-spacing:.09em; text-transform:uppercase; text-decoration:none; cursor:none; display:inline-flex; align-items:center; gap:9px; transition:all .3s; }
+.btn-outline:hover { border-color:#2E7D32; color:#2E7D32; transform:translateY(-2px); }
+
+/* ============================================================
+   SEZIONI
+   ============================================================ */
+section { padding:100px 5%; }
+.section-white  { background:#FAFAF8; }
+.section-cream  { background:#F4F0EB; }
+.section-green  { background:#F0F7F0; }
+.section-label { font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:#2E7D32; font-weight:600; display:block; margin-bottom:.9rem; }
+.section-title { font-family:'Playfair Display',serif; font-size:clamp(1.9rem,3.8vw,2.9rem); font-weight:700; color:#2C2C2C; line-height:1.2; margin-bottom:1.4rem; }
+.section-title em { color:#C8372D; font-style:italic; }
+.section-body { font-size:1rem; color:#5a5a5a; line-height:1.85; max-width:620px; }
+.divider { width:54px; height:2.5px; background:linear-gradient(to right,#C8372D,#2E7D32); margin:1.4rem 0; border-radius:2px; }
+.reveal { opacity:0; transform:translateY(36px); transition:opacity .7s ease,transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.rd1{transition-delay:.1s;} .rd2{transition-delay:.2s;} .rd3{transition-delay:.3s;}
+
+/* ============================================================
+   PACCHETTI
+   ============================================================ */
+.pacchetti-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem; max-width:1200px; margin:3rem auto 0; }
+.pkg-card {
+  background:#fff; border:1.5px solid #e8e3da; border-radius:8px;
+  padding:2rem 1.8rem; position:relative; overflow:hidden;
+  transition:all .3s ease; cursor:none;
+}
+.pkg-card:hover { border-color:#C8372D; transform:translateY(-6px); box-shadow:0 16px 48px rgba(200,55,45,.12); }
+.pkg-card.featured { border-color:#D4AF37; box-shadow:0 8px 32px rgba(212,175,55,.15); }
+.pkg-card.featured::before { content:'Più scelto'; position:absolute; top:16px; right:16px; background:#D4AF37; color:#2C2C2C; font-size:.6rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:4px 10px; border-radius:2px; }
+.pkg-card-tag { font-size:.65rem; letter-spacing:.2em; text-transform:uppercase; color:#C8372D; font-weight:700; margin-bottom:.8rem; }
+.pkg-card-name { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; color:#2C2C2C; margin-bottom:.3rem; }
+.pkg-card-date { font-size:.8rem; color:#9a9a9a; margin-bottom:1.2rem; }
+.pkg-price { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:900; color:#2C2C2C; line-height:1; margin-bottom:.3rem; }
+.pkg-price sub { font-size:1rem; font-weight:400; color:#9a9a9a; }
+.pkg-anticipo { font-size:.78rem; color:#6a6a6a; margin-bottom:1.4rem; }
+.pkg-anticipo strong { color:#2E7D32; }
+.pkg-includes { list-style:none; display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.6rem; }
+.pkg-includes li { font-size:.82rem; color:#5a5a5a; display:flex; align-items:center; gap:9px; }
+.pkg-includes li i { color:#2E7D32; font-size:.7rem; }
+.pkg-select-btn { width:100%; padding:12px; background:#2C2C2C; color:#fff; border:none; border-radius:3px; font-size:.8rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:none; font-family:'Inter',sans-serif; transition:background .25s; }
+.pkg-select-btn:hover { background:#C8372D; }
+.pkg-card.selected .pkg-select-btn { background:#2E7D32; }
+.pkg-card.selected { border-color:#2E7D32; }
+
+/* ============================================================
+   FORM MULTI-STEP
+   ============================================================ */
+.form-section { background:#F4F0EB; padding:80px 5%; }
+.form-section-intro { text-align:center; max-width:600px; margin:0 auto 50px; }
+.form-section-intro .divider { margin:1rem auto; }
+
+.form-container {
+  max-width:880px; margin:0 auto;
+  background:#fff; border-radius:8px; overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.1);
+  display:grid; grid-template-columns:300px 1fr;
+  border:1px solid #e8e3da;
+}
+
+/* Sidebar */
+.form-sidebar {
+  position:relative; overflow:hidden; background:#1a1210;
+}
+.form-sidebar-bg {
+  position:absolute; inset:0;
+  background: linear-gradient(to bottom,rgba(10,7,5,.65) 0%,rgba(200,55,45,.3) 100%),
+    url('https://static.wixstatic.com/media/1b1050_ef32de48d20a48128ecdf54d1f8b8ee2~mv2.jpg/v1/fill/w_700,h_900,al_c,q_85/1b1050_ef32de48d20a48128ecdf54d1f8b8ee2~mv2.jpg') center/cover no-repeat;
+}
+.form-sidebar-inner { position:relative; z-index:2; padding:2.2rem 1.8rem; display:flex; flex-direction:column; height:100%; }
+.form-sidebar-logo img { height:60px; filter:brightness(0) invert(1); }
+.form-sidebar-tag { font-family:'Dancing Script',cursive; font-size:1rem; color:rgba(255,255,255,.75); margin-top:6px; }
+.form-sidebar-steps { margin-top:auto; display:flex; flex-direction:column; gap:9px; }
+.s-step { display:flex; align-items:center; gap:10px; opacity:.35; transition:opacity .3s; }
+.s-step.active { opacity:1; }
+.s-step.done   { opacity:.65; }
+.s-step-n { width:26px; height:26px; border-radius:50%; border:1.5px solid rgba(255,255,255,.3); display:flex; align-items:center; justify-content:center; font-size:.72rem; color:rgba(255,255,255,.7); flex-shrink:0; transition:all .3s; }
+.s-step.active .s-step-n { background:#C8372D; border-color:#C8372D; color:#fff; }
+.s-step.done   .s-step-n { background:#D4AF37; border-color:#D4AF37; color:#2C2C2C; }
+.s-step-lbl { font-size:.78rem; color:rgba(255,255,255,.8); }
+.s-step.active .s-step-lbl { color:#fff; font-weight:500; }
+
+/* Form main */
+.form-main { background:#fff; display:flex; flex-direction:column; }
+.form-prog { height:3px; background:#f0ebe3; flex-shrink:0; }
+.form-prog-fill { height:100%; background:linear-gradient(to right,#C8372D,#2E7D32); transition:width .5s ease; }
+.form-step { padding:2.4rem 2.2rem; flex:1; display:none; flex-direction:column; }
+.form-step.active { display:flex; }
+.form-step-title { font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; color:#2C2C2C; margin-bottom:.3rem; }
+.form-step-sub   { font-size:.82rem; color:#8a8a8a; margin-bottom:1.8rem; }
+
+/* Campi */
+.fg { margin-bottom:1.1rem; }
+.fg label { display:block; font-size:.75rem; font-weight:600; color:#4a4a4a; margin-bottom:5px; letter-spacing:.03em; }
+.fi { width:100%; padding:11px 15px; border:1.5px solid #ddd8d0; border-radius:3px; background:#FAFAF8; font-size:.88rem; color:#2C2C2C; font-family:'Inter',sans-serif; outline:none; transition:border-color .25s,box-shadow .25s; }
+.fi:focus { border-color:#C8372D; box-shadow:0 0 0 3px rgba(200,55,45,.1); background:#fff; }
+.f-row { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+.f-ta  { min-height:85px; resize:vertical; }
+
+/* Radio */
+.r-group { display:flex; flex-direction:column; gap:8px; }
+.r-opt { display:flex; align-items:center; gap:11px; padding:11px 15px; border:1.5px solid #ddd8d0; border-radius:3px; background:#FAFAF8; cursor:none; transition:all .2s; }
+.r-opt:hover { border-color:#C8372D; background:#fdf5f5; }
+.r-opt.sel    { border-color:#2C2C2C; background:#fff; }
+.r-opt input  { display:none; }
+.r-dot { width:18px; height:18px; border-radius:50%; border:1.5px solid #ccc; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; }
+.r-opt.sel .r-dot { background:#2C2C2C; border-color:#2C2C2C; }
+.r-opt.sel .r-dot::after { content:''; width:7px; height:7px; border-radius:50%; background:#fff; }
+.r-opt-text { font-size:.85rem; color:#4a4a4a; }
+.r-opt-sub  { font-size:.72rem; color:#9a9a9a; margin-top:2px; }
+
+/* Riepilogo step 4 */
+.riepilogo-box { background:#F4F0EB; border:1px solid #e8e3da; border-radius:6px; padding:1.4rem 1.6rem; margin-bottom:1.4rem; }
+.riepilogo-row { display:flex; justify-content:space-between; align-items:center; padding:.4rem 0; border-bottom:1px solid #ece7df; font-size:.85rem; }
+.riepilogo-row:last-child { border-bottom:none; }
+.riepilogo-label { color:#6a6a6a; }
+.riepilogo-value { font-weight:600; color:#2C2C2C; }
+.riepilogo-value.green { color:#2E7D32; }
+.riepilogo-anticipo { background:linear-gradient(135deg,#2E7D32,#3a9e40); color:#fff; border-radius:4px; padding:1rem 1.4rem; margin-top:1rem; text-align:center; }
+.riepilogo-anticipo p { font-size:.78rem; opacity:.85; margin-bottom:4px; }
+.riepilogo-anticipo strong { font-family:'Playfair Display',serif; font-size:1.8rem; }
+
+/* Nav form */
+.form-nav { display:flex; justify-content:space-between; align-items:center; padding:1.3rem 2.2rem; border-top:1px solid #f0ebe3; flex-shrink:0; }
+.btn-f-prev { background:transparent; border:1.5px solid #ddd8d0; color:#7a7a7a; padding:10px 22px; border-radius:3px; font-size:.8rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; cursor:none; transition:all .2s; font-family:'Inter',sans-serif; }
+.btn-f-prev:hover { border-color:#2C2C2C; color:#2C2C2C; }
+.btn-f-next { background:#2C2C2C; color:#fff; border:none; padding:11px 26px; border-radius:3px; font-size:.8rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; cursor:none; transition:all .2s; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:8px; }
+.btn-f-next:hover { background:#C8372D; transform:translateY(-1px); }
+.btn-f-next:disabled { background:#ccc; cursor:not-allowed; transform:none; }
+.step-cnt { font-size:.78rem; color:#aaa; }
+
+/* Stato invio */
+.form-sending { display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem; flex:1; min-height:360px; }
+.form-sending.active { display:flex; }
+.spinner { width:48px; height:48px; border:3px solid #f0ebe3; border-top:3px solid #C8372D; border-radius:50%; animation:spin .8s linear infinite; margin-bottom:1.2rem; }
+@keyframes spin { to{transform:rotate(360deg);} }
+
+.form-ok { display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem; flex:1; min-height:360px; }
+.form-ok.active { display:flex; }
+.ok-icon { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,#C8372D,#2E7D32); display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:#fff; margin-bottom:1.4rem; animation:pop .6s cubic-bezier(.175,.885,.32,1.275); }
+@keyframes pop { from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
+.form-ok h3 { font-family:'Playfair Display',serif; font-size:1.4rem; color:#2C2C2C; margin-bottom:.5rem; }
+.form-ok p  { font-size:.88rem; color:#7a7a7a; line-height:1.75; }
+
+.form-error { display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:3rem; flex:1; min-height:360px; }
+.form-error.active { display:flex; }
+.err-icon { width:68px; height:68px; border-radius:50%; background:#f8d7da; display:flex; align-items:center; justify-content:center; font-size:1.6rem; color:#C8372D; margin-bottom:1.2rem; }
+.form-error h3 { font-family:'Playfair Display',serif; font-size:1.3rem; color:#2C2C2C; margin-bottom:.5rem; }
+.form-error p { font-size:.85rem; color:#7a7a7a; line-height:1.7; margin-bottom:1.2rem; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer { background:#F4F0EB; padding:60px 5% 28px; border-top:1px solid #e8e3da; }
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr; gap:3rem; margin-bottom:40px; }
+.footer-logo img { height:64px; margin-bottom:1rem; }
+.footer-desc { font-size:.83rem; color:#7a7a7a; line-height:1.8; max-width:260px; margin-bottom:1.2rem; }
+.socials { display:flex; gap:10px; }
+.soc-btn { width:36px; height:36px; border:1px solid #d0cbc4; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8a8a8a; text-decoration:none; font-size:.88rem; transition:all .3s; }
+.soc-btn:hover { background:#C8372D; border-color:#C8372D; color:#fff; transform:translateY(-2px); }
+.footer-col h4 { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:#aaa; margin-bottom:1rem; font-weight:600; }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:.55rem; }
+.footer-col a  { font-size:.83rem; color:#7a7a7a; text-decoration:none; transition:color .2s; }
+.footer-col a:hover { color:#C8372D; }
+.footer-bottom { border-top:1px solid #e8e3da; padding-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+.footer-copy { font-size:.75rem; color:#aaa; }
+.footer-tag  { font-family:'Dancing Script',cursive; font-size:.95rem; color:#C8372D; }
+
+/* ============================================================
+   ANIMAZIONI
+   ============================================================ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:768px){
+  section { padding:64px 5%; }
+  .nav-links { display:none; flex-direction:column; position:fixed; top:68px; left:0; right:0; background:rgba(250,250,248,.97); backdrop-filter:blur(12px); padding:1.8rem; gap:1.4rem; border-bottom:1px solid #e8e3da; }
+  .nav-links.open { display:flex; }
+  .hamburger { display:flex; }
+  .hero-title { font-size:clamp(2.3rem,9vw,3.5rem); }
+  .form-container { grid-template-columns:1fr; }
+  .form-sidebar { min-height:160px; }
+  .form-sidebar-steps { flex-direction:row; flex-wrap:wrap; }
+  .f-row { grid-template-columns:1fr; }
+  .pacchetti-grid { grid-template-columns:1fr; }
+  .footer-grid { grid-template-columns:1fr; }
+  .cursor,.cursor-ring { display:none; }
+  body { cursor:auto; }
+  a,button { cursor:pointer; }
+  .hero-dates { flex-wrap:wrap; gap:.6rem; justify-content:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursori -->
+<div class="cursor"      id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#">
+    <img src="Aggiungi_corpo_del_testo.png"
+         onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/1b1050_6c383ee430aa46b2a2a0b732569d60c7~mv2.png';"
+         alt="PeperTango" class="nav-logo">
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#pacchetti">Pacchetti</a></li>
+    <li><a href="#programma">Programma</a></li>
+    <li><a href="#location">Location</a></li>
+    <li><a href="#iscrizione" class="nav-cta">Iscriviti ora</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="particles" id="particles"></div>
+  <div class="hero-content">
+    <div class="hero-logo"><img src="Aggiungi_corpo_del_testo.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/1b1050_6c383ee430aa46b2a2a0b732569d60c7~mv2.png';" alt="PeperTango"></div>
+    <p class="hero-eyebrow">Maratona Tango Piccante 2027</p>
+    <h1 class="hero-title">Tango, passione,<br><em>destinazioni uniche.</em></h1>
+    <div class="hero-dates">
+      <span><strong>10–14 Luglio 2027</strong></span>
+      <span class="sep">|</span>
+      <span><i class="fa-solid fa-location-dot" style="color:#C8372D;"></i> Maratea, Basilicata</span>
+      <span class="sep">|</span>
+      <span>120 posti disponibili</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#iscrizione" class="btn-primary"><i class="fa-solid fa-ticket"></i> Iscriviti ora</a>
+      <a href="#pacchetti"  class="btn-outline"><i class="fa-solid fa-list"></i> Vedi pacchetti</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><div class="scroll-line"></div><span>Scorri</span></div>
+</section>
+
+<!-- PACCHETTI -->
+<section class="section-cream" id="pacchetti">
+  <div style="text-align:center;max-width:680px;margin:0 auto 56px;">
+    <span class="section-label reveal">Pacchetti disponibili</span>
+    <h2 class="section-title reveal">Scegli la tua<br><em>esperienza tango</em></h2>
+    <div class="divider reveal" style="margin:1rem auto;"></div>
+    <p class="section-body reveal" style="margin:0 auto;">€75 a persona per notte · pensione completa · tutte le tipologie di camera incluse</p>
+  </div>
+  <div class="pacchetti-grid">
+
+    <div class="pkg-card reveal" data-pkg="Cala Jannita" data-prezzo="300" data-anticipo="150" data-saldo="150" data-notti="4">
+      <div class="pkg-card-tag">Pacchetto completo · 4 notti</div>
+      <div class="pkg-card-name">Cala Jannita</div>
+      <div class="pkg-card-date"><i class="fa-regular fa-calendar"></i> Gio 10 → Lun 14 Luglio</div>
+      <div class="pkg-price">€300 <sub>/ persona</sub></div>
+      <div class="pkg-anticipo">Anticipo: <strong>€150</strong> · Saldo: <strong>€150</strong> entro 21 maggio 2027</div>
+      <ul class="pkg-includes">
+        <li><i class="fa-solid fa-check"></i> 4 notti pensione completa</li>
+        <li><i class="fa-solid fa-check"></i> Full pass milonghe</li>
+        <li><i class="fa-solid fa-check"></i> Tango workshops</li>
+        <li><i class="fa-solid fa-check"></i> Priorità camera Deluxe</li>
+        <li><i class="fa-solid fa-check"></i> Cena di benvenuto giovedì</li>
+      </ul>
+      <button class="pkg-select-btn" onclick="selezionaPacchetto(this)">Seleziona questo pacchetto</button>
+    </div>
+
+    <div class="pkg-card featured reveal rd1" data-pkg="Fiumicello" data-prezzo="225" data-anticipo="150" data-saldo="75" data-notti="3">
+      <div class="pkg-card-tag">Weekend lungo · 3 notti</div>
+      <div class="pkg-card-name">Fiumicello</div>
+      <div class="pkg-card-date"><i class="fa-regular fa-calendar"></i> Gio 10 → Dom 13 Luglio</div>
+      <div class="pkg-price">€225 <sub>/ persona</sub></div>
+      <div class="pkg-anticipo">Anticipo: <strong>€150</strong> · Saldo: <strong>€75</strong> entro 21 maggio 2027</div>
+      <ul class="pkg-includes">
+        <li><i class="fa-solid fa-check"></i> 3 notti pensione completa</li>
+        <li><i class="fa-solid fa-check"></i> Full pass milonghe</li>
+        <li><i class="fa-solid fa-check"></i> Tango workshops</li>
+        <li><i class="fa-solid fa-check"></i> Priorità camera Standard</li>
+      </ul>
+      <button class="pkg-select-btn" onclick="selezionaPacchetto(this)">Seleziona questo pacchetto</button>
+    </div>
+
+    <div class="pkg-card reveal rd2" data-pkg="Spiaggia Nera" data-prezzo="225" data-anticipo="150" data-saldo="75" data-notti="3">
+      <div class="pkg-card-tag">Weekend lungo · 3 notti</div>
+      <div class="pkg-card-name">Spiaggia Nera</div>
+      <div class="pkg-card-date"><i class="fa-regular fa-calendar"></i> Ven 11 → Lun 14 Luglio</div>
+      <div class="pkg-price">€225 <sub>/ persona</sub></div>
+      <div class="pkg-anticipo">Anticipo: <strong>€150</strong> · Saldo: <strong>€75</strong> entro 21 maggio 2027</div>
+      <ul class="pkg-includes">
+        <li><i class="fa-solid fa-check"></i> 3 notti pensione completa</li>
+        <li><i class="fa-solid fa-check"></i> Full pass milonghe</li>
+        <li><i class="fa-solid fa-check"></i> Tango workshops</li>
+        <li><i class="fa-solid fa-check"></i> Priorità camera Standard</li>
+      </ul>
+      <button class="pkg-select-btn" onclick="selezionaPacchetto(this)">Seleziona questo pacchetto</button>
+    </div>
+
+    <div class="pkg-card reveal rd3" data-pkg="Porto di Maratea" data-prezzo="150" data-anticipo="150" data-saldo="0" data-notti="2">
+      <div class="pkg-card-tag">Weekend · 2 notti</div>
+      <div class="pkg-card-name">Porto di Maratea</div>
+      <div class="pkg-card-date"><i class="fa-regular fa-calendar"></i> Ven 11 → Dom 13 Luglio</div>
+      <div class="pkg-price">€150 <sub>/ persona</sub></div>
+      <div class="pkg-anticipo">Anticipo unico: <strong>€150</strong> · Nessun saldo</div>
+      <ul class="pkg-includes">
+        <li><i class="fa-solid fa-check"></i> 2 notti pensione completa</li>
+        <li><i class="fa-solid fa-check"></i> Full pass milonghe</li>
+        <li><i class="fa-solid fa-check"></i> Tango workshops</li>
+        <li><i class="fa-solid fa-check"></i> Pagamento unico</li>
+      </ul>
+      <button class="pkg-select-btn" onclick="selezionaPacchetto(this)">Seleziona questo pacchetto</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- FORM ISCRIZIONE -->
+<div class="form-section" id="iscrizione">
+  <div class="form-section-intro reveal">
+    <span class="section-label">Iscrizione</span>
+    <h2 class="section-title">Prenota il tuo<br><em>posto in pista</em></h2>
+    <div class="divider"></div>
+    <p class="section-body" style="margin:0 auto;">Compila il form — ti risponderemo entro 48 ore con la conferma e il link per il pagamento dell'anticipo.</p>
+  </div>
+
+  <div class="form-container reveal">
+    <!-- Sidebar -->
+    <div class="form-sidebar">
+      <div class="form-sidebar-bg"></div>
+      <div class="form-sidebar-inner">
+        <div>
+          <div class="form-sidebar-logo"><img src="Aggiungi_corpo_del_testo.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/1b1050_6c383ee430aa46b2a2a0b732569d60c7~mv2.png';" alt="PeperTango"></div>
+          <div class="form-sidebar-tag">... dove il tempo si ferma</div>
+        </div>
+        <div class="form-sidebar-steps">
+          <div class="s-step active" id="ss1"><div class="s-step-n">1</div><div class="s-step-lbl">Pacchetto</div></div>
+          <div class="s-step"        id="ss2"><div class="s-step-n">2</div><div class="s-step-lbl">Dati personali</div></div>
+          <div class="s-step"        id="ss3"><div class="s-step-n">3</div><div class="s-step-lbl">Camera & note</div></div>
+          <div class="s-step"        id="ss4"><div class="s-step-n">4</div><div class="s-step-lbl">Riepilogo</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form main -->
+    <div class="form-main">
+      <div class="form-prog"><div class="form-prog-fill" id="progFill" style="width:25%"></div></div>
+
+      <!-- STEP 1: Pacchetto + Ruolo -->
+      <div class="form-step active" id="fs1">
+        <h2 class="form-step-title">Pacchetto e ruolo</h2>
+        <p class="form-step-sub">Quale pacchetto hai scelto e come balli?</p>
+        <div class="fg">
+          <label>Pacchetto selezionato</label>
+          <div class="r-group" id="pkgRadioGroup">
+            <label class="r-opt" onclick="selR(this,'pkg');syncPacchetto('Cala Jannita')">
+              <input type="radio" name="pkg" value="Cala Jannita"><div class="r-dot"></div>
+              <div><div class="r-opt-text"><strong>Cala Jannita</strong> — €300</div><div class="r-opt-sub">Gio 10 → Lun 14 · 4 notti</div></div>
+            </label>
+            <label class="r-opt" onclick="selR(this,'pkg');syncPacchetto('Fiumicello')">
+              <input type="radio" name="pkg" value="Fiumicello"><div class="r-dot"></div>
+              <div><div class="r-opt-text"><strong>Fiumicello</strong> — €225</div><div class="r-opt-sub">Gio 10 → Dom 13 · 3 notti</div></div>
+            </label>
+            <label class="r-opt" onclick="selR(this,'pkg');syncPacchetto('Spiaggia Nera')">
+              <input type="radio" name="pkg" value="Spiaggia Nera"><div class="r-dot"></div>
+              <div><div class="r-opt-text"><strong>Spiaggia Nera</strong> — €225</div><div class="r-opt-sub">Ven 11 → Lun 14 · 3 notti</div></div>
+            </label>
+            <label class="r-opt" onclick="selR(this,'pkg');syncPacchetto('Porto di Maratea')">
+              <input type="radio" name="pkg" value="Porto di Maratea"><div class="r-dot"></div>
+              <div><div class="r-opt-text"><strong>Porto di Maratea</strong> — €150</div><div class="r-opt-sub">Ven 11 → Dom 13 · 2 notti</div></div>
+            </label>
+          </div>
+        </div>
+        <div class="fg" style="margin-top:1.2rem;">
+          <label>Balli come…?</label>
+          <div class="r-group">
+            <label class="r-opt" onclick="selR(this,'ruolo')"><input type="radio" name="ruolo" value="Leader"><div class="r-dot"></div><span class="r-opt-text">Leader (guida)</span></label>
+            <label class="r-opt" onclick="selR(this,'ruolo')"><input type="radio" name="ruolo" value="Follower"><div class="r-dot"></div><span class="r-opt-text">Follower</span></label>
+            <label class="r-opt" onclick="selR(this,'ruolo')"><input type="radio" name="ruolo" value="Entrambi"><div class="r-dot"></div><span class="r-opt-text">Entrambi i ruoli</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Dati personali -->
+      <div class="form-step" id="fs2">
+        <h2 class="form-step-title">Dati personali</h2>
+        <p class="form-step-sub">Come ti chiami e come ti contatto?</p>
+        <div class="fg"><label>Nome e cognome *</label><input type="text" class="fi" id="f_nome" placeholder="Es. Andrea Rossi"></div>
+        <div class="fg"><label>Email *</label><input type="email" class="fi" id="f_email" placeholder="tuo@email.com"></div>
+        <div class="fg"><label>Telefono (formato internazionale)</label><input type="tel" class="fi" id="f_tel" placeholder="+39 333 1234567"></div>
+        <div class="f-row">
+          <div class="fg"><label>Città</label><input type="text" class="fi" id="f_citta" placeholder="Milano"></div>
+          <div class="fg"><label>Paese</label><input type="text" class="fi" id="f_paese" placeholder="Italia"></div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Camera + note -->
+      <div class="form-step" id="fs3">
+        <h2 class="form-step-title">Camera e note</h2>
+        <p class="form-step-sub">Preferenze sulla camera e richieste speciali</p>
+        <div class="fg">
+          <label>Disposizione letti</label>
+          <div class="r-group">
+            <label class="r-opt" onclick="selR(this,'letto')"><input type="radio" name="letto" value="Matrimoniale"><div class="r-dot"></div><span class="r-opt-text">1 Letto matrimoniale</span></label>
+            <label class="r-opt" onclick="selR(this,'letto')"><input type="radio" name="letto" value="Singoli"><div class="r-dot"></div><span class="r-opt-text">2 Letti singoli</span></label>
+          </div>
+        </div>
+        <div class="fg" style="margin-top:1.2rem;">
+          <label>Compagno/a di camera (se già lo sai)</label>
+          <input type="text" class="fi" id="f_compagno" placeholder="Nome e cognome del/la compagno/a">
+          <p style="font-size:.72rem;color:#aaa;margin-top:5px;">Lascia vuoto se vuoi che ve lo assegniamo noi</p>
+        </div>
+        <div class="fg" style="margin-top:.8rem;">
+          <label>Note o richieste speciali</label>
+          <textarea class="fi f-ta" id="f_note" placeholder="Allergie alimentari, esigenze particolari..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 4: Riepilogo -->
+      <div class="form-step" id="fs4">
+        <h2 class="form-step-title">Riepilogo iscrizione</h2>
+        <p class="form-step-sub">Verifica i dati prima di inviare</p>
+        <div class="riepilogo-box" id="riepilogoBox">
+          <!-- compilato da JS -->
+        </div>
+        <div class="riepilogo-anticipo">
+          <p>Anticipo da versare per confermare il posto</p>
+          <strong id="riepilogoAnticipo">€150</strong>
+        </div>
+        <p style="font-size:.75rem;color:#aaa;margin-top:1rem;line-height:1.65;">
+          Dopo l'invio riceverai una email di conferma. Quando Danilo approverà la tua iscrizione riceverai il link per il pagamento dell'anticipo.
+        </p>
+      </div>
+
+      <!-- Invio in corso -->
+      <div class="form-sending" id="formSending">
+        <div class="spinner"></div>
+        <p style="color:#6a6a6a;font-size:.9rem;">Invio in corso…</p>
+      </div>
+
+      <!-- Successo -->
+      <div class="form-ok" id="formOk">
+        <div class="ok-icon"><i class="fa-solid fa-check"></i></div>
+        <h3>Iscrizione inviata!</h3>
+        <p>Abbiamo ricevuto la tua richiesta e ti abbiamo inviato una email di conferma.<br><br>Danilo esaminerà la tua iscrizione e riceverai presto il link per il pagamento dell'anticipo.<br><br><em style="color:#C8372D;">Ci vediamo in pista! 💃🕺</em></p>
+      </div>
+
+      <!-- Errore -->
+      <div class="form-error" id="formError">
+        <div class="err-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3>Qualcosa è andato storto</h3>
+        <p id="errMsg">Si è verificato un errore durante l'invio. Riprova o contattaci direttamente.</p>
+        <button class="btn-primary" onclick="resetErrore()" style="font-size:.8rem;padding:11px 24px;">Riprova</button>
+      </div>
+
+      <!-- Navigazione -->
+      <div class="form-nav" id="formNav">
+        <button class="btn-f-prev" id="btnPrev" onclick="prevS()" style="visibility:hidden;">← Indietro</button>
+        <span class="step-cnt" id="stepCnt">1 di 4</span>
+        <button class="btn-f-next" id="btnNext" onclick="nextS()">Avanti <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="contatti">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo"><img src="Aggiungi_corpo_del_testo.png" onerror="this.onerror=null;this.src='https://static.wixstatic.com/media/1b1050_6c383ee430aa46b2a2a0b732569d60c7~mv2.png';" alt="PeperTango"></div>
+      <p class="footer-desc">Minivacanze di tango argentino in location esclusive del Sud Italia. Passione, musica e abrazos senza fine.</p>
+      <div class="socials">
+        <a href="https://www.facebook.com/search/top?q=pepertango" class="soc-btn" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/" class="soc-btn" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Evento</h4>
+      <ul>
+        <li><a href="#pacchetti">Pacchetti</a></li>
+        <li><a href="#iscrizione">Iscrizione</a></li>
+        <li><a href="#location">Location</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contatti</h4>
+      <ul>
+        <li><a href="mailto:pepertango@gmail.com">pepertango@gmail.com</a></li>
+        <li><a href="https://www.pepertango.com" target="_blank">www.pepertango.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2027 PeperTango – Peper Bruzia ASD · Tutti i diritti riservati</p>
+    <p class="footer-tag">"Dove il tempo si ferma e la musica continua."</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   CONFIG — CAMBIA SOLO QUESTA URL SE RIDEPLOY
+   ============================================================ */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx5lnoBRqshl1YVly5MyjSC3nJUp5sRlo8Wy7QGv8vy34J9XmdPZk2vIDSd_cX2ka17/exec';
+
+const PACCHETTI_INFO = {
+  'Cala Jannita':     { prezzo:300, anticipo:150, saldo:150, notti:4 },
+  'Fiumicello':       { prezzo:225, anticipo:150, saldo:75,  notti:3 },
+  'Spiaggia Nera':    { prezzo:225, anticipo:150, saldo:75,  notti:3 },
+  'Porto di Maratea': { prezzo:150, anticipo:150, saldo:0,   notti:2 }
+};
+
+/* ============================================================
+   STATO FORM
+   ============================================================ */
+let step = 1;
+const TOT = 4;
+let formData = {};
+
+/* ============================================================
+   CURSORE
+   ============================================================ */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{ mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'; });
+(function anim(){ rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(anim);})();
+document.querySelectorAll('a,button,.pkg-card,.r-opt').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.classList.add('big');ring.classList.add('big');});
+  el.addEventListener('mouseleave',()=>{cur.classList.remove('big');ring.classList.remove('big');});
+});
+
+/* ============================================================
+   NAVBAR + PARALLAX + PARTICELLE + REVEAL
+   ============================================================ */
+window.addEventListener('scroll',()=>{ document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>40); });
+const ham=document.getElementById('hamburger'),nl=document.getElementById('navLinks');
+ham.addEventListener('click',()=>nl.classList.toggle('open'));
+nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nl.classList.remove('open')));
+window.addEventListener('scroll',()=>{ const b=document.getElementById('heroBg');if(b)b.style.transform=`scale(1.04) translateY(${window.scrollY*.26}px)`;});
+const pc=document.getElementById('particles');
+for(let i=0;i<26;i++){ const p=document.createElement('div');p.className='particle';const sz=Math.random()*3+1;p.style.cssText=`left:${Math.random()*100}%;bottom:-10px;width:${sz}px;height:${sz}px;background:${Math.random()>.5?'rgba(200,55,45,.5)':'rgba(46,125,50,.5)'};animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*12}s;`;pc.appendChild(p);}
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ============================================================
+   SELEZIONE PACCHETTO DALLE CARD
+   ============================================================ */
+function selezionaPacchetto(btn) {
+  const card = btn.closest('.pkg-card');
+  const pkg  = card.dataset.pkg;
+
+  // Deseleziona tutte le card
+  document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+
+  // Sincronizza radio nel form
+  syncPacchetto(pkg);
+
+  // Scrolla al form
+  setTimeout(() => {
+    document.getElementById('iscrizione').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 200);
+}
+
+// Seleziona il radio corretto nel form step 1
+function syncPacchetto(pkg) {
+  document.querySelectorAll('[name="pkg"]').forEach(r => {
+    if (r.value === pkg) {
+      r.checked = true;
+      r.closest('.r-opt').classList.add('sel');
+    } else {
+      r.closest('.r-opt').classList.remove('sel');
+    }
+  });
+  formData.pacchetto = pkg;
+}
+
+/* ============================================================
+   FORM MULTI-STEP
+   ============================================================ */
+function updateForm() {
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  const s = document.getElementById('fs' + step);
+  if (s) s.classList.add('active');
+
+  document.getElementById('progFill').style.width = (step / TOT * 100) + '%';
+
+  for (let i = 1; i <= TOT; i++) {
+    const ss = document.getElementById('ss' + i);
+    if (!ss) continue;
+    ss.classList.remove('active', 'done');
+    if (i === step) ss.classList.add('active');
+    else if (i < step) ss.classList.add('done');
+  }
+
+  document.getElementById('btnPrev').style.visibility = step > 1 ? 'visible' : 'hidden';
+  const bn = document.getElementById('btnNext');
+  bn.innerHTML = step === TOT
+    ? 'Invia iscrizione <i class="fa-solid fa-paper-plane"></i>'
+    : 'Avanti <i class="fa-solid fa-arrow-right"></i>';
+  document.getElementById('stepCnt').textContent = step + ' di ' + TOT;
+
+  // Compila riepilogo allo step 4
+  if (step === TOT) compilaRiepilogo();
+}
+
+function nextS() {
+  if (!validaStep(step)) return;
+
+  if (step < TOT) {
+    step++;
+    updateForm();
+  } else {
+    inviaForm();
+  }
+}
+
+function prevS() {
+  if (step > 1) { step--; updateForm(); }
+}
+
+/* ============================================================
+   VALIDAZIONE
+   ============================================================ */
+function validaStep(s) {
+  if (s === 1) {
+    const pkg   = document.querySelector('[name="pkg"]:checked');
+    const ruolo = document.querySelector('[name="ruolo"]:checked');
+    if (!pkg)   { alert('Seleziona un pacchetto'); return false; }
+    if (!ruolo) { alert('Seleziona il tuo ruolo'); return false; }
+    formData.pacchetto = pkg.value;
+    formData.ruolo     = ruolo.value;
+  }
+  if (s === 2) {
+    const nome  = document.getElementById('f_nome').value.trim();
+    const email = document.getElementById('f_email').value.trim();
+    if (!nome)  { alert('Inserisci il tuo nome'); return false; }
+    if (!email || !email.includes('@')) { alert('Inserisci un\'email valida'); return false; }
+    formData.nome  = nome;
+    formData.email = email;
+    formData.tel   = document.getElementById('f_tel').value.trim();
+    formData.citta = document.getElementById('f_citta').value.trim();
+    formData.paese = document.getElementById('f_paese').value.trim();
+  }
+  if (s === 3) {
+    const letto = document.querySelector('[name="letto"]:checked');
+    if (!letto) { alert('Seleziona la disposizione letti'); return false; }
+    formData.letto    = letto.value;
+    formData.compagno = document.getElementById('f_compagno').value.trim();
+    formData.note     = document.getElementById('f_note').value.trim();
+  }
+  return true;
+}
+
+/* ============================================================
+   RIEPILOGO STEP 4
+   ============================================================ */
+function compilaRiepilogo() {
+  const pkg  = PACCHETTI_INFO[formData.pacchetto] || {};
+  const rows = [
+    ['Pacchetto',  formData.pacchetto  || '—'],
+    ['Ruolo',      formData.ruolo      || '—'],
+    ['Nome',       formData.nome       || '—'],
+    ['Email',      formData.email      || '—'],
+    ['Telefono',   formData.tel        || '—'],
+    ['Città',      (formData.citta||'—') + ', ' + (formData.paese||'')],
+    ['Letto',      formData.letto      || '—'],
+    ['Compagno',   formData.compagno   || 'da assegnare'],
+    ['Prezzo totale', '€' + pkg.prezzo],
+    ['Saldo',      '€' + (pkg.saldo || 0)]
+  ];
+  document.getElementById('riepilogoBox').innerHTML = rows.map(([l,v]) =>
+    `<div class="riepilogo-row">
+      <span class="riepilogo-label">${l}</span>
+      <span class="riepilogo-value ${l==='Prezzo totale'?'green':''}">${v}</span>
+    </div>`
+  ).join('');
+  document.getElementById('riepilogoAnticipo').textContent = '€' + (pkg.anticipo || 150);
+}
+
+/* ============================================================
+   INVIO AL GOOGLE SHEET VIA APPS SCRIPT
+   ============================================================ */
+function inviaForm() {
+  // Nascondi nav e step, mostra spinner
+  document.getElementById('formNav').style.display = 'none';
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('formSending').classList.add('active');
+
+  const payload = {
+    action:    'nuova_iscrizione',
+    nome:      formData.nome      || '',
+    email:     formData.email     || '',
+    tel:       formData.tel       || '',
+    citta:     formData.citta     || '',
+    paese:     formData.paese     || '',
+    ruolo:     formData.ruolo     || '',
+    pacchetto: formData.pacchetto || '',
+    letto:     formData.letto     || '',
+    compagno:  formData.compagno  || '',
+    note:      formData.note      || ''
+  };
+
+  // Usa fetch con no-cors per evitare il problema CORS su file://
+  // Il server Apps Script risponde sempre 200 anche con no-cors
+  fetch(APPS_SCRIPT_URL, {
+    method:  'POST',
+    mode:    'no-cors',             // ← risolve il CORS su hosting statico
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(() => {
+    // Con no-cors non possiamo leggere la risposta, ma se fetch non lancia
+    // eccezioni l'invio è andato a buon fine
+    mostraSuccesso();
+  })
+  .catch(err => {
+    console.error('Errore invio:', err);
+    mostraErrore('Errore di rete. Controlla la connessione e riprova.');
+  });
+}
+
+function mostraSuccesso() {
+  document.getElementById('formSending').classList.remove('active');
+  document.getElementById('formOk').classList.add('active');
+  // Aggiorna progress bar al 100%
+  document.getElementById('progFill').style.width = '100%';
+  for (let i = 1; i <= TOT; i++) {
+    const ss = document.getElementById('ss' + i);
+    if (ss) { ss.classList.remove('active'); ss.classList.add('done'); }
+  }
+}
+
+function mostraErrore(msg) {
+  document.getElementById('formSending').classList.remove('active');
+  document.getElementById('errMsg').textContent = msg || 'Errore sconosciuto.';
+  document.getElementById('formError').classList.add('active');
+}
+
+function resetErrore() {
+  document.getElementById('formError').classList.remove('active');
+  document.getElementById('formNav').style.display = 'flex';
+  // Torna all'ultimo step
+  document.getElementById('fs' + step).classList.add('active');
+}
+
+/* ============================================================
+   RADIO BUTTON
+   ============================================================ */
+function selR(el, name) {
+  document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.r-opt').classList.remove('sel'));
+  el.classList.add('sel');
+  el.querySelector('input').checked = true;
+}
+</script>
+</body>
+</html>
